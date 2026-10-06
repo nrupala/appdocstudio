@@ -111,9 +111,12 @@ Generate all docs:
 
 ## 🤝 Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full process (draft PR →
+CI green → owner merges, CHANGELOG entry, no direct pushes to `main`).
+
 1. Fork the repo
 2. Create branch
-3. Submit PR
+3. Submit a draft PR
 
 ---
 
