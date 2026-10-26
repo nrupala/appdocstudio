@@ -130,7 +130,7 @@ class McpTests(unittest.TestCase):
             self.assertEqual(init["result"]["serverInfo"]["name"], "appdocstudio")
             tools = call({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
             names = {t["name"] for t in tools["result"]["tools"]}
-            self.assertEqual(names, {"scan_project", "generate_docs", "role_pack"})
+            self.assertEqual(names, {"scan_project", "generate_docs", "role_pack", "list_formats"})
             scan = call({"jsonrpc": "2.0", "id": 3, "method": "tools/call",
                          "params": {"name": "scan_project", "arguments": {"path": str(proj)}}})
             summary = json.loads(scan["result"]["content"][0]["text"])
