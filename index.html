@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <!--
   AppDocStudio — Developer Documentation Engine
-  Copyright (c) 2026 Nrupal Akolkar
-  Licensed under the MIT License — see LICENSE at the repository root.
+  Copyright 2026 2351485 ALBERTA INC.
+  Licensed under the Apache License, Version 2.0 — see LICENSE at the
+  repository root and LICENSING.md for the licensing map. Earlier copies
+  distributed under the MIT License keep their MIT terms.
 -->
 
 <html lang="en">
@@ -304,7 +306,7 @@
             
             files.forEach(f => {
                 // Find functions - improved regex for function, const, async
-                const funcMatches = f.code.match(/(?:async\s+)?function\s+([a-zA-Z_$][\w$]*)|const\s+([a-zA-Z_$][\w$]*)\s*=\s*(?:async\s+)?(?:\(|function|=>|{)/g;
+                const funcMatches = f.code.match(/(?:async\s+)?function\s+([a-zA-Z_$][\w$]*)|const\s+([a-zA-Z_$][\w$]*)\s*=\s*(?:async\s+)?(?:\(|function|=>|{)/g);
                 if(funcMatches) {
                     funcMatches.forEach(m => {
                         const nameMatch = m.match(/(?:async\s+)?function\s+([a-zA-Z_$][\w$]*)|const\s+([a-zA-Z_$][\w$]*)\s*=/);

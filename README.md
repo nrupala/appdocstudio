@@ -1,131 +1,132 @@
-# AppDocStudio - Developer Documentation Engine
+# AppDocStudio — one scan, six audience-tailored documentation sets
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-3.0.0-blue" alt="Version">
-  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
-  <img src="https://img.shields.io/badge/100%20Vanilla-JS-yellow" alt="Vanilla JS">
-  <img src="https://img.shields.io/badge/Role%20Based%20Docs-purple" alt="Roles">
+  <img src="https://img.shields.io/badge/Version-1.0.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/License-Apache--2.0-green" alt="License: Apache-2.0">
+  <img src="https://img.shields.io/badge/Dependencies-zero-yellow" alt="Zero dependencies">
+  <img src="https://img.shields.io/badge/Role%20Based%20Docs-6%20audiences-purple" alt="Six role packs">
 </p>
 
-**Auto-generate developer documentation with role-based views for different audiences!**
+Most documentation generators produce **one** developer reference. AppDocStudio
+scans a codebase once and generates **six documentation sets, one per audience** —
+because users, regulators, and on-call operators do not need the same document:
 
----
+| Audience | What they get |
+|---|---|
+| 👤 **Users** | Getting-started tutorial, task how-tos, feature reference |
+| 💻 **Developers** | API reference from real parsing, architecture, OpenAPI section |
+| 🔧 **Maintainers** | Licence inventory (SPDX), module map, documentation-health report |
+| 📋 **Regulators** | Compliance-evidence pack: SPDX inventory, CycloneDX component list, SHA-256 source inventory |
+| ⚙️ **Admins** | Installation, configuration inventory, backup/restore |
+| 🚀 **Ops** | Runbook: bring-up, incident response, CI/deployment workflows |
 
-## 🎯 What is AppDocStudio?
+Every pack is structured on the **Diátaxis** framework (tutorial / how-to /
+reference / explanation) and emitted as **CommonMark Markdown** and
+**WCAG-conscious HTML** (semantic landmarks, skip link, checked contrast —
+see [docs/STANDARDS.md](docs/STANDARDS.md) for the standards the output is
+designed to meet).
 
-AppDocStudio scans your project and creates comprehensive, role-specific documentation for different stakeholders.
+## The free face — no install
 
-### Features
+Open [`index.html`](index.html) in a browser. It is a single-file, zero-dependency
+web tool: pick a project folder, scan it, and read or export role-based docs,
+2D/3D flow views, and a call graph. Nothing leaves your machine.
 
-| Category | Features |
-|----------|----------|
-| 🔍 **Scanning** | Project scan, file analysis, line counting |
-| 📂 **Structure** | File tree, type breakdown |
-| ⚡ **Functions** | Function detection with params |
-| 🔀 **Variables** | Variable tracking table |
-| 🔀 **Flow 2D** | 2D execution flow visualization |
-| 🌐 **Flow 3D** | 3D code structure |
-| 📋 **Workflow** | Call graph, app flow |
-| 👥 **Roles** | Role-based documentation |
+AppDocStudio is free. If it saves you time, the tip jar is in
+[`.github/FUNDING.yml`](.github/FUNDING.yml) (Buy Me a Coffee / PayPal) —
+tips are voluntary and buy nothing extra.
 
----
+## The productized core — CLI and MCP server
 
-## 👥 Role-Based Documentation
+Version 1.0 adds a real parser core (no more regex-grade detection):
 
-### Audience-Specific Docs
+- **Python** — parsed with the standard-library `ast` module: classes,
+  methods, functions, signatures with types and defaults, docstrings.
+- **TypeScript / JavaScript** — parsed by a hand-written lexer and
+  recursive-descent parser that builds a declaration AST: functions,
+  arrow functions, classes, interfaces, enums, type aliases, JSDoc/TSDoc
+  comments. Strings and comments that merely *look* like code never leak
+  into the output.
 
-| Role | Button | What They Get |
-|------|--------|---------------|
-| 👤 **Users** | Users button | How-to guide, features, FAQ |
-| 💻 **Developers** | Developer button | API reference, architecture, setup |
-| 🔧 **Maintainers** | Maintainer button | Build process, debugging, releases |
-| 📋 **Regulators** | Regulator button | Compliance, security, audit trail |
-| ⚙️ **Admins** | Admin button | Installation, config, backup |
-| 🚀 **Ops** | Ops button | Deployment, CI/CD, runbooks |
+Zero dependencies — Python standard library only, Python ≥ 3.10.
 
----
+Parser scope, honestly: the TS/JS parser covers the *declaration* grammar
+(functions, classes, interfaces, enums, type aliases, imports/exports,
+JSDoc/TSDoc). Constructs outside that grammar — for example conditional
+or namespace re-export blocks — are skipped, never misreported; a file
+that cannot be parsed at all is reported with its parse error, not
+silently dropped.
 
-## 🚀 Quick Start
+### Quick start
 
-1. Open `index.html`
-2. Enter project path
-3. Click **Scan Project**
-4. Go to **Roles** tab
-5. Click any role button to generate tailored docs
+```bash
+pip install .            # or run without installing: PYTHONPATH=src python3 -m appdocstudio
 
----
+appdocstudio scan ./your-project
+appdocstudio generate ./your-project -o appdocs     # six packs (.md + .html) + sbom.cdx.json
+appdocstudio role-pack ./your-project regulators    # one pack to stdout
+```
 
-## 📖 Role Guides
+### MCP server
 
-### 👤 User Guide
-- Getting started instructions
-- Feature overview
-- How-to tutorials
-- FAQ section
-- Support contacts
+AppDocStudio is also an MCP server (stdio), so an AI agent can document a
+codebase as a tool call:
 
-### 💻 Developer Guide
-- Architecture diagrams
-- Setup/installation
-- API reference
-- Code structure
-- Testing guide
+```json
+{
+  "mcpServers": {
+    "appdocstudio": {
+      "command": "appdocstudio-mcp"
+    }
+  }
+}
+```
 
-### 🔧 Maintainer Guide
-- Code overview
-- Dependencies
-- Build process
-- Debugging tips
-- Release notes
+Tools: `scan_project` · `generate_docs` · `role_pack`.
 
-### 📋 Regulatory Docs
-- Compliance checklist
-- Security policies
-- Data handling
-- Audit trail
+## Standards the output is designed to meet
 
-### ⚙️ Admin Guide
-- Installation steps
-- Configuration
-- Monitoring
-- User management
-- Backup/restore
+These are **design targets the output is built to** — not certifications.
+The full table, with what each one means for the generated documents, is in
+[docs/STANDARDS.md](docs/STANDARDS.md): Diátaxis, CommonMark, OpenAPI 3.1,
+TSDoc/JSDoc and Google-style docstrings, ISO/IEC/IEEE 26514 and 15289,
+WCAG 2.2 AA, SPDX + CycloneDX, schema.org, and SOC 2 / ISO 27001
+evidence-production support (the Regulator pack assembles audit-trail
+documentation; it never claims to certify anything).
 
-### 🚀 Ops Guide
-- Deployment steps
-- Scaling info
-- Monitoring setup
-- CI/CD pipeline
-- Runbooks
+## Tests
 
----
+```bash
+python3 -m unittest discover -s tests
+```
 
-## 📁 Output
+The suite covers both parsers, the scanner, all six packs, the HTML
+renderer, the CLI end to end, and a live MCP stdio round-trip.
 
-Generate all docs:
-- 📝 README.md
-- 📋 ALL_ROLE_DOCS.md (all roles)
-- 📦 JSON for tools
+## Commercial
 
----
+The code is Apache-2.0 and needs no commercial licence. 2351485 ALBERTA INC.
+sells the doing around it — documentation engagements, custom role packs,
+integration and CI doc-drift work — see
+[COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md) and the licence map in
+[LICENSING.md](LICENSING.md).
 
-## 🤝 Contributing
+## Licence
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full process (draft PR →
-CI green → owner merges, CHANGELOG entry, no direct pushes to `main`).
+Apache License, Version 2.0 — see [LICENSE](LICENSE).
+Copyright 2026 2351485 ALBERTA INC.
 
-1. Fork the repo
-2. Create branch
-3. Submit a draft PR
+> Note: copies of AppDocStudio obtained before 2026-10-26 were distributed
+> under the MIT License and keep their MIT terms; the Apache-2.0 licence
+> applies from the 2026-10-26 licence change onward.
 
----
+## Contributing
 
-## 📄 License
-
-MIT
+See [CONTRIBUTING.md](CONTRIBUTING.md): draft PR → CI green → owner merges,
+a CHANGELOG entry per PR, no direct pushes to `main`.
 
 ---
 
 <p align="center">
-  <strong>AppDocStudio</strong> - Documentation for Every Role
+  <strong>AppDocStudio</strong> — documentation for every role · by AIMLDS (2351485 ALBERTA INC.)
 </p>
