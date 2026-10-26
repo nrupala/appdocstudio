@@ -20,3 +20,6 @@ jobs:
         if [ -f "README.md" ]; then echo "✓ README.md exists"; else echo "✗ README.md missing"; fi
         if [ -f "LICENSE" ]; then echo "✓ LICENSE exists"; else echo "✗ LICENSE missing"; fi
         if [ -f ".gitignore" ]; then echo "✓ .gitignore exists"; else echo "✗ .gitignore missing"; fi
+    - name: Run test suite (parser core, packs, CLI, MCP)
+      run: |
+        python3 -m unittest discover -s tests -v

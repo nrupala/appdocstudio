@@ -35,3 +35,10 @@ bower_components/
 *.bak
 *.swp
 *~
+# AppDocStudio generated docs + gate evidence
+appdocs/
+.release-gate/
+
+# Python
+__pycache__/
+*.pyc
