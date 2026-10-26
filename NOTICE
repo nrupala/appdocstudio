@@ -1,9 +1,2 @@
 AppDocStudio
 Copyright 2026 2351485 ALBERTA INC.
-
-This product is licensed under the Apache License, Version 2.0 — see the
-LICENSE file at the repository root and the licensing map in LICENSING.md.
-
-Third-party components: none. The web tool is 100% vanilla JavaScript with
-zero dependencies; the parser core, CLI, and MCP server use only the Python
-standard library.
