@@ -5,6 +5,20 @@ All notable changes to AppDocStudio are documented here. Format follows
 
 ## [Unreleased]
 
+### Added — 1.1.0 (owner-directed extension, 2026-10-26)
+- **Standards-format packs:** every pack renders in eight house-standard
+  profiles on the Diátaxis spine — Apache (ASF), Google, Microsoft, Apple,
+  W3C, ISO, ANSI, European (EN) — via `--doc-format` (CLI), `doc_format`
+  (MCP/API/agent). Profiles apply front matter, section naming, heading
+  case, clause numbering, verbal-form conventions, and honest
+  not-a-publication footers. See `docs/FORMATS.md`.
+- **REST API surface:** `appdocstudio serve` — local-first stdlib HTTP API
+  (`/health`, `/v1/formats`, `/v1/roles`, `/v1/scan`, `/v1/role-pack`,
+  `/v1/generate`).
+- **Agent surface:** `appdocstudio agent` (JSON task protocol on
+  stdin/stdout) and `appdocstudio agent-schema` (function-calling
+  schemas); MCP gains a fourth tool, `list_formats`.
+
 ### Added
 - **Productized v1:** AST-based parser core for Python (stdlib `ast`) and
   TypeScript/JavaScript (hand-written lexer + recursive-descent declaration

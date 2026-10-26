@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "appdocstudio"
-version = "1.0.0"
+version = "1.1.0"
 description = "One scan, six audience-tailored documentation sets — role-based docs for users, developers, maintainers, regulators, admins, and ops, from real AST parsing of Python and TypeScript/JavaScript."
 readme = "README.md"
 license = { text = "Apache-2.0" }

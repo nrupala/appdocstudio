@@ -1,7 +1,7 @@
 # AppDocStudio — one scan, six audience-tailored documentation sets
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.0.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/Version-1.1.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/License-Apache--2.0-green" alt="License: Apache-2.0">
   <img src="https://img.shields.io/badge/Dependencies-zero-yellow" alt="Zero dependencies">
   <img src="https://img.shields.io/badge/Role%20Based%20Docs-6%20audiences-purple" alt="Six role packs">
@@ -38,7 +38,7 @@ tips are voluntary and buy nothing extra.
 
 ## The productized core — CLI and MCP server
 
-Version 1.0 adds a real parser core (no more regex-grade detection):
+The productized core ships a real parser core (no more regex-grade detection):
 
 - **Python** — parsed with the standard-library `ast` module: classes,
   methods, functions, signatures with types and defaults, docstrings.
@@ -82,7 +82,40 @@ codebase as a tool call:
 }
 ```
 
-Tools: `scan_project` · `generate_docs` · `role_pack`.
+Tools: `scan_project` · `generate_docs` · `role_pack` · `list_formats`.
+
+## Standards-format packs
+
+The same scan renders in the structure and style of the major
+documentation standards and house styles — **Apache (ASF), Google,
+Microsoft, Apple, W3C, ISO, ANSI, and European (EN)** — on top of the
+Diátaxis spine:
+
+```bash
+appdocstudio generate ./your-project --doc-format iso     # numbered clauses, Foreword, shall-forms
+appdocstudio role-pack ./your-project developers --doc-format google
+```
+
+Each profile applies the checkable parts of its standard: front matter,
+section naming, heading case, clause numbering, verbal-form conventions,
+and an honest footer (a pack in the ISO profile follows ISO drafting
+structure; it is not an ISO standard). Full table: [docs/FORMATS.md](docs/FORMATS.md).
+
+## Every surface
+
+| Surface | Status | Entry point |
+|---|---|---|
+| Web tool (free face) | ✅ live in this repo | `index.html` |
+| CLI | ✅ | `appdocstudio scan / generate / role-pack / formats` |
+| MCP server | ✅ | `appdocstudio-mcp` (stdio) |
+| REST API | ✅ | `appdocstudio serve` — local-first HTTP API (`/v1/scan`, `/v1/generate`, `/v1/role-pack`, `/v1/formats`) |
+| Agent | ✅ | `appdocstudio agent` (JSON task protocol) + `appdocstudio agent-schema` (function-calling schemas) |
+| Browser extension | ◻ named cell — in sequence | planned: generate docs for the repo in the current tab |
+| Desktop app | ◻ named cell — in sequence | planned: packaged studio (the web face + core, offline) |
+
+Extension and desktop are recorded as endpoint cells in sequence: under
+the house completeness rule they are either built or explicitly waived
+by the owner — they are not claimed here until they exist.
 
 ## Standards the output is designed to meet
 
