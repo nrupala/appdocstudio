@@ -1,4 +1,4 @@
-"""AppDocStudio MCP server — scan_project / generate_docs / role_pack.
+"""AppDocStudio MCP server — scan_project / generate_docs / role_pack / list_formats.
 
 A stdio MCP server using only the Python standard library. Speaks
 newline-delimited JSON-RPC 2.0 as per the Model Context Protocol.
@@ -19,6 +19,7 @@ import json
 import sys
 
 from . import __version__
+from .formats import FORMAT_IDS
 from .html_render import pack_to_html
 from .packs import ROLES, build_all_packs, build_pack, bom_json
 from .scanner import scan_project
@@ -47,6 +48,8 @@ TOOLS = [
             "properties": {
                 "path": {"type": "string"},
                 "format": {"type": "string", "enum": ["md", "html"], "default": "md"},
+                "doc_format": {"type": "string", "enum": list(FORMAT_IDS), "default": "diataxis",
+                               "description": "Standards-format profile (Apache/Google/Microsoft/Apple/W3C/ISO/ANSI/EN/base)"},
             },
             "required": ["path"],
         },
@@ -60,9 +63,16 @@ TOOLS = [
                 "path": {"type": "string"},
                 "role": {"type": "string", "enum": list(ROLES)},
                 "format": {"type": "string", "enum": ["md", "html"], "default": "md"},
+                "doc_format": {"type": "string", "enum": list(FORMAT_IDS), "default": "diataxis",
+                               "description": "Standards-format profile (Apache/Google/Microsoft/Apple/W3C/ISO/ANSI/EN/base)"},
             },
             "required": ["path", "role"],
         },
+    },
+    {
+        "name": "list_formats",
+        "description": "List the standards-format profiles a pack can be rendered in.",
+        "inputSchema": {"type": "object", "properties": {}},
     },
 ]
 
@@ -74,11 +84,15 @@ def _text(payload: str) -> dict:
 def call_tool(name: str, arguments: dict) -> dict:
     if name not in {t["name"] for t in TOOLS}:
         raise ValueError(f"Unknown tool: {name}")
+    if name == "list_formats":
+        from .agent import list_formats
+        return _text(list_formats())
     path = arguments.get("path")
     if not path:
         raise ValueError("Argument 'path' is required")
     project = scan_project(path)
     fmt = arguments.get("format", "md")
+    doc_format = arguments.get("doc_format", "diataxis")
     if name == "scan_project":
         summary = {
             "name": project.name,
@@ -99,12 +113,14 @@ def call_tool(name: str, arguments: dict) -> dict:
     if name == "generate_docs":
         parts = []
         for pack in build_all_packs(project):
-            parts.append(pack.to_markdown(project) if fmt == "md" else pack_to_html(pack, project))
+            parts.append(pack.to_markdown(project, doc_format) if fmt == "md"
+                         else pack_to_html(pack, project, doc_format))
         parts.append(bom_json(project) if fmt == "md" else "")
         return _text("\n\n---\n\n".join(part for part in parts if part))
     # role_pack
     pack = build_pack(project, arguments["role"])
-    return _text(pack.to_markdown(project) if fmt == "md" else pack_to_html(pack, project))
+    return _text(pack.to_markdown(project, doc_format) if fmt == "md"
+                 else pack_to_html(pack, project, doc_format))
 
 
 def handle(request: dict) -> dict | None:

@@ -127,8 +127,8 @@ def markdown_to_html(md: str) -> str:
     return "\n".join(out)
 
 
-def pack_to_html(pack: Pack, project: ProjectInfo) -> str:
-    md = pack.to_markdown(project)
+def pack_to_html(pack: Pack, project: ProjectInfo, doc_format: str = "diataxis") -> str:
+    md = pack.to_markdown(project, doc_format)
     body = markdown_to_html(md)
     json_ld = {
         "@context": "https://schema.org",
