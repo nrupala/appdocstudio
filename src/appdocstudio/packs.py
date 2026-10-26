@@ -195,7 +195,8 @@ def _maintainers(p: ProjectInfo) -> Pack:
     pack = Pack(role="maintainers", title=ROLE_TITLES["maintainers"])
     undocumented = [(m.path, f.name) for m in p.modules for f in
                     (m.functions + [meth for c in m.classes for meth in c.methods]) if not f.summary]
-    drift = (f"{len(undocumented)} documented-surface items have no doc comment. "
+    noun = "item" if len(undocumented) == 1 else "items"
+    drift = (f"{len(undocumented)} documented-surface {noun} have no doc comment. "
              "First five: " + ", ".join(f"`{path}::{name}`" for path, name in undocumented[:5]) + "."
              if undocumented else "Every function and method in the documented surface carries a doc comment.")
     pack.sections = [

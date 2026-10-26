@@ -101,3 +101,43 @@ class JsParserTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TesterRegressionTests(unittest.TestCase):
+    """Regressions from the independent tester's 2026-10-26 report (F1/F2)."""
+
+    def test_async_function_keeps_jsdoc(self):
+        src = ("/** Fetch one widget by id. */\n"
+               "export async function fetchWidget(id: string): Promise<Widget> {\n"
+               "  return load(id);\n}\n")
+        mod = parse_js(src, "a.ts", "ts")
+        self.assertEqual(len(mod.functions), 1)
+        fn = mod.functions[0]
+        self.assertTrue(fn.is_async)
+        self.assertIsNotNone(fn.doc)
+        self.assertIn("Fetch one widget", fn.doc)
+        self.assertEqual(fn.returns, "Promise<Widget>")
+
+    def test_generic_function_does_not_swallow_next_declaration(self):
+        src = ("export function identity<T>(value: T): T { return value; }\n"
+               "export function after(x: number): number { return x + 1; }\n")
+        mod = parse_js(src, "g.ts", "ts")
+        self.assertEqual([f.name for f in mod.functions], ["identity", "after"])
+        self.assertEqual(mod.functions[0].params[0].type, "T")
+        self.assertEqual(mod.functions[0].returns, "T")
+        self.assertIsNone(mod.parse_error)
+
+    def test_generic_method_and_nested_generic_params(self):
+        src = ("export class Box {\n"
+               "  /** Wrap a value. */\n"
+               "  wrap<T>(v: T): Promise<T> { return Promise.resolve(v); }\n"
+               "}\n"
+               "export function nested(m: Map<string, Array<number>>): "
+               "Map<string, Array<number>> { return m; }\n")
+        mod = parse_js(src, "n.ts", "ts")
+        method = mod.classes[0].methods[0]
+        self.assertEqual(method.returns, "Promise<T>")
+        self.assertIn("Wrap a value", method.doc or "")
+        nested = mod.functions[0]
+        self.assertEqual(len(nested.params), 1)
+        self.assertEqual(nested.params[0].type, "Map<string, Array<number>>")

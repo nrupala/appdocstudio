@@ -29,6 +29,18 @@ All notable changes to AppDocStudio are documented here. Format follows
   (script-parse check + role-button/tab presence) so the class cannot
   escape twice.
 
+- **TypeScript generic functions desynchronised the parser** (independent
+  tester finding F2): `function identity<T>(...)` lost its signature and
+  silently dropped the following declaration. Type-parameter groups are
+  now skipped with proper angle-bracket handling, and commas inside
+  generic type arguments no longer split parameters. Regression-tested.
+- **JSDoc dropped on top-level `async function` declarations** (tester
+  finding F1): the doc comment now carries through `async` and through
+  function expressions. Regression-tested.
+- Signature rendering no longer inserts spaces inside generics
+  (`Promise<T>`, not `Promise < T >`); maintainers pack pluralisation
+  fixed (tester findings F3/F4).
+
 ### Changed
 - **Licence: MIT → Apache-2.0 + commercial** (Director's decision,
   2026-10-26), copyright holder 2351485 ALBERTA INC. Added `LICENSING.md`

@@ -25,6 +25,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import re
 
 from .model import ClassInfo, FunctionInfo, ModuleInfo, Param, first_summary
 
@@ -241,6 +242,28 @@ class Parser:
                 if depth == 0:
                     return
 
+    def skip_angle(self) -> None:
+        """Consume one '<...>' type-parameter group starting at the cursor.
+
+        Angle brackets are not in _OPEN: generic closers can arrive as the
+        single tokens '>>' or '>>>' (the lexer merges runs of '>'), so depth
+        is counted by token contribution, not by bracket pairs.
+        """
+        tok = self.peek()
+        if tok is None or tok.value != "<":
+            return
+        depth = 0
+        while True:
+            t = self.next()
+            if t is None:
+                return
+            if t.value == "<":
+                depth += 1
+            elif t.value in (">", ">>", ">>>"):
+                depth -= len(t.value)
+                if depth <= 0:
+                    return
+
     def skip_statement(self) -> None:
         depth = 0
         while True:
@@ -276,15 +299,29 @@ class Parser:
                     break
                 depth -= 1
             inner.append(self.next())
-        # split on top-level commas
+        # split on top-level commas; commas inside generic type arguments
+        # (Map<string, number>) are protected by angle tracking that is
+        # active only inside a type annotation (after ':' and before '=')
         groups: list[list[Token]] = [[]]
         depth = 0
+        angle = 0
+        in_type = False
         for tok in inner:
             if tok.value in _OPEN:
                 depth += 1
             elif tok.value in _CLOSE:
                 depth -= 1
-            if tok.value == "," and depth == 0:
+            if depth == 0 and tok.value == ":":
+                in_type = True
+            elif depth == 0 and tok.value == "=":
+                in_type = False
+                angle = 0
+            if in_type:
+                if tok.value == "<":
+                    angle += 1
+                elif tok.value in (">", ">>", ">>>"):
+                    angle = max(0, angle - len(tok.value))
+            if tok.value == "," and depth == 0 and angle == 0:
                 groups.append([])
             else:
                 groups[-1].append(tok)
@@ -294,6 +331,15 @@ class Parser:
                 continue
             params.append(self._one_param(group))
         return params
+
+    @staticmethod
+    def _tighten(text: str) -> str:
+        """Remove token-join spaces inside type syntax: Promise < T > ->
+        Promise<T>, string [ ] -> string[], Map < string , number > ->
+        Map<string, number>."""
+        text = re.sub(r"\s+([<>\[\],])", r"\1", text)
+        text = re.sub(r"([<>\[])\s+", r"\1", text)
+        return text
 
     @staticmethod
     def _one_param(group: list[Token]) -> Param:
@@ -336,7 +382,7 @@ class Parser:
                 type_parts.append(v)
             elif mode == "default":
                 default_parts.append(v)
-        join = lambda parts: " ".join(parts).replace(" ,", ",").replace("( ", "(").replace(" )", ")") or None
+        join = lambda parts: Parser._tighten(" ".join(parts)) or None
         return Param(name=name, type=join(type_parts), default=join(default_parts),
                      optional=optional or bool(default_parts))
 
@@ -345,7 +391,7 @@ class Parser:
         if not self.eat(":"):
             return None
         toks = self.collect_until("{", ";", "=>", "=")
-        text = " ".join(t.value for t in toks).strip()
+        text = Parser._tighten(" ".join(t.value for t in toks).strip())
         return text or None
 
     # -- declarations ------------------------------------------------------
@@ -396,7 +442,10 @@ class Parser:
             if tok is None:
                 return
         if tok.value == "async" and self.peek(1) is not None and self.peek(1).value == "function":
-            self.next()
+            async_tok = self.next()
+            nxt = self.peek()
+            if nxt is not None and async_tok is not None and async_tok.doc and not nxt.doc:
+                nxt.doc = async_tok.doc  # doc rides onto 'function' for take_doc()
             fn = self.parse_function(async_=True)
             if fn:
                 fn.exported = exported
@@ -426,7 +475,7 @@ class Parser:
             if name_tok is not None:
                 head = name_tok.value
                 tail = self.collect_until(";")
-                text = " ".join(t.value for t in tail).strip()
+                text = Parser._tighten(" ".join(t.value for t in tail).strip())
                 if text.startswith("="):
                     text = text[1:].strip()
                 mod.type_aliases.append(f"{head} = {text}".strip())
@@ -454,7 +503,7 @@ class Parser:
         if name_tok is None or name_tok.kind != "ident":
             return None
         if self.at("<"):
-            self.skip_balanced()  # type parameters
+            self.skip_angle()  # type parameters
         params = self.parse_params() if self.at("(") else []
         returns = self.parse_type_tail()
         if self.at("{"):
@@ -544,7 +593,7 @@ class Parser:
         name = name_tok.value.strip("\"'")
         self.next()
         if self.at("<"):
-            self.skip_balanced()
+            self.skip_angle()
         if self.at("("):
             params = self.parse_params()
             returns = self.parse_type_tail()
@@ -562,7 +611,7 @@ class Parser:
         ptype = None
         if self.eat(":"):
             toks = self.collect_until("=", ";", "\n")
-            ptype = " ".join(t.value for t in toks).strip() or None
+            ptype = Parser._tighten(" ".join(t.value for t in toks).strip()) or None
         if self.at("="):
             self.next()
             self.collect_until(";")
@@ -671,6 +720,9 @@ class Parser:
                     fn = self.parse_function(async_=is_async)
                     if fn is not None:
                         fn.name = name
+                        if fn.doc is None and doc:
+                            fn.doc = doc
+                            fn.summary = first_summary(doc)
                 elif self.at("("):
                     save = self.pos
                     params = self.parse_params()

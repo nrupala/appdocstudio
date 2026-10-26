@@ -16,7 +16,7 @@ because users, regulators, and on-call operators do not need the same document:
 | 👤 **Users** | Getting-started tutorial, task how-tos, feature reference |
 | 💻 **Developers** | API reference from real parsing, architecture, OpenAPI section |
 | 🔧 **Maintainers** | Licence inventory (SPDX), module map, documentation-health report |
-| 📋 **Regulators** | Compliance-evidence pack: SPDX inventory, CycloneDX component list, SHA-256 source inventory |
+| 📋 **Regulators** | Compliance-evidence pack: SPDX inventory, SHA-256 source inventory; `generate` also emits a CycloneDX SBOM (`sbom.cdx.json`) alongside the packs |
 | ⚙️ **Admins** | Installation, configuration inventory, backup/restore |
 | 🚀 **Ops** | Runbook: bring-up, incident response, CI/deployment workflows |
 
