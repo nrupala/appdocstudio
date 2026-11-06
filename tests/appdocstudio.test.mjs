@@ -7,7 +7,7 @@ const root = new URL('..', import.meta.url);
 const html = readFileSync(new URL('index.html', root), 'utf8');
 
 function extractScript() {
-  const blocks = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+  const blocks = [...html.matchAll(/<script>([\s\S]*?)<\/script>/gi)].map(m => m[1]);
   assert.ok(blocks.length >= 1, 'index.html must contain an inline script');
   return blocks.join('\n');
 }
