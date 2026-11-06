@@ -20,3 +20,12 @@ jobs:
         if [ -f "README.md" ]; then echo "✓ README.md exists"; else echo "✗ README.md missing"; fi
         if [ -f "LICENSE" ]; then echo "✓ LICENSE exists"; else echo "✗ LICENSE missing"; fi
         if [ -f ".gitignore" ]; then echo "✓ .gitignore exists"; else echo "✗ .gitignore missing"; fi
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Run test suite
+      run: node --test tests/appdocstudio.test.mjs
