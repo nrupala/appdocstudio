@@ -41,24 +41,35 @@ def main() -> int:
 
     root = tk.Tk()
     root.title(f"AppDocStudio {__version__} — Documentation Studio")
-    root.geometry("640x430")
+    root.geometry("680x500")
 
     project_var = tk.StringVar()
     out_var = tk.StringVar(value=str(Path.cwd() / "appdocs"))
     role_var = tk.StringVar(value="all")
     format_var = tk.StringVar(value="diataxis")
+    medium_var = tk.StringVar(value="both")
+    recent_var = tk.StringVar()
     status_var = tk.StringVar(value="Pick a project folder to begin.")
+
+    def show_summary(path: str) -> None:
+        try:
+            s = logic.scan_summary(path)
+            status_var.set(f"{s['name']}: {s['files']} files, {s['lines']} lines, "
+                           f"{s['modules']} modules parsed.")
+        except Exception as exc:
+            status_var.set(f"Scan failed: {exc}")
 
     def browse_project() -> None:
         chosen = filedialog.askdirectory(title="Project folder")
         if chosen:
             project_var.set(chosen)
-            try:
-                s = logic.scan_summary(chosen)
-                status_var.set(f"{s['name']}: {s['files']} files, {s['lines']} lines, "
-                               f"{s['modules']} modules parsed.")
-            except Exception as exc:
-                status_var.set(f"Scan failed: {exc}")
+            show_summary(chosen)
+
+    def pick_recent(_event=None) -> None:
+        chosen = recent_var.get()
+        if chosen:
+            project_var.set(chosen)
+            show_summary(chosen)
 
     def browse_out() -> None:
         chosen = filedialog.askdirectory(title="Output folder")
@@ -68,11 +79,30 @@ def main() -> int:
     def run_generate() -> None:
         try:
             written = logic.generate(project_var.get(), out_var.get(),
-                                     role=role_var.get(), doc_format=format_var.get())
+                                     role=role_var.get(), doc_format=format_var.get(),
+                                     medium=medium_var.get())
             status_var.set(f"Wrote {len(written)} files to {out_var.get()}")
         except Exception as exc:
             messagebox.showerror("AppDocStudio", str(exc))
             status_var.set(f"Failed: {exc}")
+
+    def run_preview() -> None:
+        role = role_var.get()
+        role = "users" if role == "all" else role
+        try:
+            result = logic.preview(project_var.get(), role=role,
+                                   doc_format=format_var.get())
+        except Exception as exc:
+            messagebox.showerror("AppDocStudio", str(exc))
+            status_var.set(f"Preview failed: {exc}")
+            return
+        window = tk.Toplevel(root)
+        window.title(f"Preview — {result['role']} ({result['doc_format']})")
+        window.geometry("720x560")
+        text = tk.Text(window, wrap="word")
+        text.insert("1.0", result["markdown"])
+        text.configure(state="disabled")
+        text.pack(fill="both", expand=True)
 
     pad = {"padx": 10, "pady": 6}
     ttk.Label(root, text="Project folder").grid(row=0, column=0, sticky="w", **pad)
@@ -89,18 +119,26 @@ def main() -> int:
     ttk.Label(root, text="Standards format").grid(row=3, column=0, sticky="w", **pad)
     ttk.Combobox(root, textvariable=format_var, values=FORMAT_IDS,
                  state="readonly").grid(row=3, column=1, sticky="w", **pad)
+    ttk.Label(root, text="Output").grid(row=4, column=0, sticky="w", **pad)
+    ttk.Combobox(root, textvariable=medium_var, values=("both", "md", "html"),
+                 state="readonly").grid(row=4, column=1, sticky="w", **pad)
 
     ttk.Button(root, text="Generate documentation", command=run_generate).grid(
-        row=4, column=1, sticky="w", **pad)
+        row=5, column=1, sticky="w", **pad)
+    ttk.Button(root, text="Preview pack", command=run_preview).grid(
+        row=5, column=0, sticky="w", **pad)
     ttk.Button(root, text="Open output folder",
-               command=lambda: _open_folder(out_var.get())).grid(row=4, column=2, **pad)
+               command=lambda: _open_folder(out_var.get())).grid(row=5, column=2, **pad)
 
     recents = logic.load_recents()
     if recents:
-        ttk.Label(root, text="Recent: " + " · ".join(Path(r).name for r in recents[:4])).grid(
-            row=5, column=0, columnspan=3, sticky="w", **pad)
+        ttk.Label(root, text="Recent projects").grid(row=6, column=0, sticky="w", **pad)
+        box = ttk.Combobox(root, textvariable=recent_var, values=recents,
+                           state="readonly", width=52)
+        box.grid(row=6, column=1, **pad)
+        box.bind("<<ComboboxSelected>>", pick_recent)
     ttk.Label(root, textvariable=status_var, wraplength=600).grid(
-        row=6, column=0, columnspan=3, sticky="w", **pad)
+        row=7, column=0, columnspan=3, sticky="w", **pad)
 
     root.mainloop()
     return 0

@@ -80,6 +80,20 @@ def generate(project_path: str, outdir: str, role: str = "all",
     return written
 
 
+def preview(project_path: str, role: str = "users",
+            doc_format: str = "diataxis") -> dict:
+    """Render one role pack in memory (nothing written to disk), for the
+    desktop app's preview pane. Returns {role, doc_format, markdown}."""
+    if role not in ROLES:
+        raise ValueError(f"Unknown role '{role}'. Valid roles: {', '.join(ROLES)}")
+    if doc_format not in FORMAT_IDS:
+        raise ValueError(f"Unknown format '{doc_format}'. Valid formats: {', '.join(FORMAT_IDS)}")
+    project = scan_project(project_path)
+    pack = build_pack(project, role)
+    return {"role": pack.role, "doc_format": doc_format,
+            "markdown": pack.to_markdown(project, doc_format)}
+
+
 def scan_summary(project_path: str) -> dict:
     project = scan_project(project_path)
     return {
