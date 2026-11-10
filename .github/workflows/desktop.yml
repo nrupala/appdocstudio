@@ -1,0 +1,36 @@
+name: Desktop builds
+
+# Builds the AppDocStudio desktop app with PyInstaller on each OS.
+# Runs on demand and on version tags; artifacts are uploaded for the run
+# and, on tags, attached to the GitHub release by the release process.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: [ "v*" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install build tooling (CI-only dependency)
+      run: pip install pyinstaller
+    - name: Build desktop binary
+      run: >
+        pyinstaller --onefile --windowed --name AppDocStudio
+        --paths src --collect-submodules appdocstudio
+        src/appdocstudio/desktop.py
+    - name: Smoke check the artifact exists
+      shell: bash
+      run: ls -la dist/
+    - uses: actions/upload-artifact@v4
+      with:
+        name: appdocstudio-desktop-${{ matrix.os }}
+        path: dist/
