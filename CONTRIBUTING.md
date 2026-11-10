@@ -19,10 +19,12 @@ Thank you for your interest in contributing to AppDocStudio!
 
 1. Fork the repository and create a feature branch
    (`git checkout -b feature/amazing-feature`).
-2. Make your changes — AppDocStudio is a single static `index.html`
-   (100% vanilla JS, no build step). Open it in a browser to test.
-3. Verify the file still loads and the scan flow works
-   (open `index.html`, click through the roles tabs).
+2. Make your changes — the web tool is a single static `index.html`
+   (100% vanilla JS, no build step); the parser core, CLI, and MCP server
+   live in `src/appdocstudio/` (Python, standard library only).
+3. Verify: run `python3 -m unittest discover -s tests` (must be green) and,
+   if you touched the web tool, open `index.html` and click through the
+   roles tabs.
 4. Add your `CHANGELOG.md` entry under `## [Unreleased]`.
 5. Commit with conventional commits (`feat:`, `fix:`, `docs:`, `chore:`).
 6. Push to your fork and open a **draft** PR.
@@ -36,4 +38,4 @@ Thank you for your interest in contributing to AppDocStudio!
 ## License
 
 By contributing, you agree that your contributions are licensed under the
-MIT License (see `LICENSE`).
+Apache License, Version 2.0 (see `LICENSE`).

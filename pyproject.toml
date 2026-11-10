@@ -1,0 +1,25 @@
+# AppDocStudio — productized v1 (parser core, CLI, MCP server).
+# The single-file web tool (index.html) needs no build and no install.
+# Copyright 2026 2351485 ALBERTA INC. — SPDX-License-Identifier: Apache-2.0
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "appdocstudio"
+version = "1.1.0"
+description = "One scan, six audience-tailored documentation sets — role-based docs for users, developers, maintainers, regulators, admins, and ops, from real AST parsing of Python and TypeScript/JavaScript."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.10"
+authors = [{ name = "2351485 ALBERTA INC." }]
+keywords = ["documentation", "diataxis", "mcp", "ast", "typescript", "python"]
+dependencies = []
+
+[project.scripts]
+appdocstudio = "appdocstudio.cli:main"
+appdocstudio-mcp = "appdocstudio.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
