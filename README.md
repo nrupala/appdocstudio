@@ -1,7 +1,7 @@
 # AppDocStudio — one scan, six audience-tailored documentation sets
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-1.1.0-blue" alt="Version">
+  <img src="https://img.shields.io/badge/Version-1.2.0-blue" alt="Version">
   <img src="https://img.shields.io/badge/License-Apache--2.0-green" alt="License: Apache-2.0">
   <img src="https://img.shields.io/badge/Dependencies-zero-yellow" alt="Zero dependencies">
   <img src="https://img.shields.io/badge/Role%20Based%20Docs-6%20audiences-purple" alt="Six role packs">
@@ -110,12 +110,12 @@ structure; it is not an ISO standard). Full table: [docs/FORMATS.md](docs/FORMAT
 | MCP server | ✅ | `appdocstudio-mcp` (stdio) |
 | REST API | ✅ | `appdocstudio serve` — local-first HTTP API (`/v1/scan`, `/v1/generate`, `/v1/role-pack`, `/v1/formats`) |
 | Agent | ✅ | `appdocstudio agent` (JSON task protocol) + `appdocstudio agent-schema` (function-calling schemas) |
-| Browser extension | ◻ named cell — in sequence | planned: generate docs for the repo in the current tab |
-| Desktop app | ◻ named cell — in sequence | planned: packaged studio (the web face + core, offline) |
+| Browser extension | ✅ built (load-unpacked) | `extension/` — MV3 popup paired with the local API; store submission is a separate owner-gated step |
+| Desktop app | ✅ built | `appdocstudio desktop` (tkinter, stdlib); packaged binaries built by the Desktop builds workflow (PyInstaller on Linux/Windows/macOS) |
 
-Extension and desktop are recorded as endpoint cells in sequence: under
-the house completeness rule they are either built or explicitly waived
-by the owner — they are not claimed here until they exist.
+All seven cells now exist. The extension ships load-unpacked from this
+repository (store submission is a separate, owner-gated step), and the
+desktop app ships as source plus CI-built binaries — see the releases.
 
 ## Standards the output is designed to meet
 

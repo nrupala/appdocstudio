@@ -4,7 +4,7 @@ Usage:
     appdocstudio scan <project> [--json]
     appdocstudio generate <project> [-o OUTDIR] [--format md|html|both] [--doc-format PROFILE]
     appdocstudio role-pack <project> <role> [--format md|html] [--doc-format PROFILE]
-    appdocstudio formats | serve [--port N] | agent-schema | agent
+    appdocstudio formats | serve [--port N] | agent-schema | agent | desktop
 
 Local-first: no network calls are made, ever.
 
@@ -77,6 +77,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("agent", help="Agent task protocol: one JSON task per line on stdin, "
                                  "one JSON result per line on stdout")
 
+    sub.add_parser("desktop", help="Launch the desktop app (native window over the core)")
+
     args = parser.parse_args(argv)
 
     if args.command == "formats":
@@ -99,6 +101,10 @@ def main(argv: list[str] | None = None) -> int:
         for result in run_stream(sys.stdin):
             print(json.dumps(result))
         return 0
+
+    if args.command == "desktop":
+        from .desktop import main as desktop_main
+        return desktop_main()
 
     try:
         project = scan_project(args.project)

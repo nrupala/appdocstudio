@@ -5,7 +5,22 @@ All notable changes to AppDocStudio are documented here. Format follows
 
 ## [Unreleased]
 
-### Added — 1.1.0 (owner-directed extension, 2026-10-26)
+## [1.2.0] — 2026-11-09
+
+### Added
+- **Desktop app cell:** `appdocstudio desktop` — a native window (tkinter,
+  stdlib) over the core: pick a project, a role pack, and a standards
+  format; generate and open the output. Behaviour lives in the tested
+  `desktop_logic` module; packaged binaries are built by the new
+  Desktop builds workflow (PyInstaller, Linux/Windows/macOS).
+- **Browser extension cell:** `extension/` — an MV3 popup paired with
+  the local API (loopback-only host permission, no remote endpoints):
+  generate a role pack for a local project folder and download it as
+  Markdown. Ships load-unpacked; store submission is owner-gated.
+
+## [1.1.0] — 2026-11-09 (merged; released as v1.1.0)
+
+### Added — owner-directed extension, 2026-10-26
 - **Standards-format packs:** every pack renders in eight house-standard
   profiles on the Diátaxis spine — Apache (ASF), Google, Microsoft, Apple,
   W3C, ISO, ANSI, European (EN) — via `--doc-format` (CLI), `doc_format`
