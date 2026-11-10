@@ -4,4 +4,4 @@ Copyright 2026 2351485 ALBERTA INC. — SPDX-License-Identifier: Apache-2.0
 Licence map: see LICENSING.md at the repository root.
 """
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"

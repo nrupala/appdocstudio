@@ -71,6 +71,9 @@ def main(argv: list[str] | None = None) -> int:
     p_serve = sub.add_parser("serve", help="Run the REST API server (local-first, 127.0.0.1)")
     p_serve.add_argument("--host", default="127.0.0.1")
     p_serve.add_argument("--port", type=int, default=8932)
+    p_serve.add_argument("--token", default=None,
+                         help="Require this bearer token on /v1/* endpoints "
+                              "(or set the APPDOCSTUDIO_API_TOKEN env var)")
 
     sub.add_parser("agent-schema", help="Print the agent tool schemas (function-calling shape)")
 
@@ -89,7 +92,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "serve":
         from .api import serve
-        return serve(args.host, args.port)
+        return serve(args.host, args.port, token=args.token)
 
     if args.command == "agent-schema":
         from .agent import tool_schemas

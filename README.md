@@ -108,10 +108,10 @@ structure; it is not an ISO standard). Full table: [docs/FORMATS.md](docs/FORMAT
 | Web tool (free face) | ✅ live in this repo | `index.html` |
 | CLI | ✅ | `appdocstudio scan / generate / role-pack / formats` |
 | MCP server | ✅ | `appdocstudio-mcp` (stdio) |
-| REST API | ✅ | `appdocstudio serve` — local-first HTTP API (`/v1/scan`, `/v1/generate`, `/v1/role-pack`, `/v1/formats`) |
+| REST API | ✅ | `appdocstudio serve` — local-first HTTP API (`/v1/scan`, `/v1/generate`, `/v1/role-pack`, `/v1/formats`); self-describing (`/openapi.json`), optional bearer-token auth (`--token`) |
 | Agent | ✅ | `appdocstudio agent` (JSON task protocol) + `appdocstudio agent-schema` (function-calling schemas) |
 | Browser extension | ⏸ parked | `extension/` — MV3 source kept for later development; release only via the Chrome Web Store once Google grants publishing room (owner's standing rule: no off-store distribution, ever) |
-| Desktop app | ✅ built | `appdocstudio desktop` (tkinter, stdlib); packaged binaries built by the Desktop builds workflow (PyInstaller on Linux/Windows/macOS) |
+| Desktop app | ✅ built | `appdocstudio desktop` (tkinter, stdlib) — pack preview, output-medium choice, clickable recent projects; packaged binaries built by the Desktop builds workflow (PyInstaller on Linux/Windows/macOS) |
 
 Six cells are live. The browser extension is parked by the owner's
 ruling — its source waits in `extension/` and it will be released only
