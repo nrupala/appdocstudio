@@ -110,11 +110,11 @@ structure; it is not an ISO standard). Full table: [docs/FORMATS.md](docs/FORMAT
 | MCP server | ✅ | `appdocstudio-mcp` (stdio) |
 | REST API | ✅ | `appdocstudio serve` — local-first HTTP API (`/v1/scan`, `/v1/generate`, `/v1/role-pack`, `/v1/formats`) |
 | Agent | ✅ | `appdocstudio agent` (JSON task protocol) + `appdocstudio agent-schema` (function-calling schemas) |
-| Browser extension | ✅ built (load-unpacked) | `extension/` — MV3 popup paired with the local API; store submission is a separate owner-gated step |
+| Browser extension | ✅ built, self-hosted | `extension/` — MV3 popup paired with the local API; installed from our own repo (dist zip + `extension/INSTALL.md`), never via a store (owner's ruling) |
 | Desktop app | ✅ built | `appdocstudio desktop` (tkinter, stdlib); packaged binaries built by the Desktop builds workflow (PyInstaller on Linux/Windows/macOS) |
 
-All seven cells now exist. The extension ships load-unpacked from this
-repository (store submission is a separate, owner-gated step), and the
+All seven cells now exist. The extension is self-hosted from this
+repository by the owner's ruling (no store distribution), and the
 desktop app ships as source plus CI-built binaries — see the releases.
 
 ## Standards the output is designed to meet
