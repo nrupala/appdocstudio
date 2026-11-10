@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "AppDocStudio",
+  "version": "1.2.0",
+  "description": "Generate role-based documentation for a project on this machine, via your local AppDocStudio API.",
+  "action": { "default_popup": "popup.html", "default_title": "AppDocStudio" },
+  "permissions": [],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "icons": {}
+}
