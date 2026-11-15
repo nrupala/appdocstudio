@@ -248,7 +248,7 @@
     <script>
         // === APPDOCSTUDIO PRO ===
         
-        let projectData = {files:[], functions:[], vars:[], workflows:[], callGraph:[], totalLines:0};
+        let projectData = {path:'', files:[], functions:[], vars:[], workflows:[], callGraph:[], totalLines:0};
         
         // Universal Handshake Protocol
         const HANDSAKE = {
@@ -336,7 +336,7 @@
                 });
             });
             
-            projectData = {files, functions:funcs, vars, callGraph, totalLines:files.reduce((s,f)=>s+f.lines,0)};
+            projectData = {path, files, functions:funcs, vars, callGraph, totalLines:files.reduce((s,f)=>s+f.lines,0)};
             
             document.getElementById('fileCount').textContent = files.length;
             document.getElementById('codeCount').textContent = files.filter(f=>f.name.match(/\.(js|ts|py)$/)).length;
