@@ -49,6 +49,21 @@ class WebFaceTests(unittest.TestCase):
         self.assertEqual(proc.returncode, 0,
                          f"inline script does not parse:\n{proc.stderr[:500]}")
 
+    def test_projectdata_reads_are_constructed(self):
+        # Regression guard for the 2026-11-15 walk finding: exportFull()
+        # read projectData.path, but neither projectData construction
+        # ever set it, so the Full Docs export printed "# undefined".
+        # Every key read off projectData must be a key that BOTH
+        # constructions (initial value + scan assignment) provide.
+        reads = set(re.findall(r"projectData\.(\w+)", self.html))
+        constructions = re.findall(r"projectData = \{([^}]*)\}", self.html)
+        self.assertGreaterEqual(len(constructions), 2)
+        for body in constructions:
+            for key in reads:
+                self.assertRegex(body, rf"\b{key}\b",
+                                 f"projectData.{key} is read but not "
+                                 f"constructed in: {body[:80]}")
+
     def test_licence_header_is_apache(self):
         self.assertIn("Apache License, Version 2.0", self.html[:600])
         self.assertIn("2351485 ALBERTA INC.", self.html[:600])
